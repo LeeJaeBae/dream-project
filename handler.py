@@ -112,7 +112,12 @@ def _comfy_upload_image(
     - 응답 형식은 설치/버전에 따라 다를 수 있어, 최소한 filename만 확보합니다.
     """
     files = {"image": (filename, image_bytes, "application/octet-stream")}
-    r = requests.post(f"{base_url}/upload/image", files=files, timeout=timeout_s)
+    effective_timeout_s = int(os.environ.get("COMFY_UPLOAD_TIMEOUT_S", str(timeout_s)))
+    r = requests.post(
+        f"{base_url}/upload/image",
+        files=files,
+        timeout=effective_timeout_s,
+    )
     r.raise_for_status()
     try:
         data = r.json()
@@ -356,6 +361,16 @@ def handler(event: Dict[str, Any]) -> Dict[str, Any]:
         pass
 
     comfy_base_url = _get_comfy_base_url()
+
+    # ComfyUI가 안 떠있으면, 업로드/웹소켓에서 오래 대기하지 않도록 여기서 빠르게 종료
+    comfy_http_root = f"{comfy_base_url}/"
+    max_retries = int(os.environ.get("COMFY_API_AVAILABLE_MAX_RETRIES", "50"))
+    interval_ms = int(os.environ.get("COMFY_API_AVAILABLE_INTERVAL_MS", "50"))
+    if not _check_server(comfy_http_root, retries=max_retries, delay_ms=interval_ms):
+        return {
+            "error": "ComfyUI server not reachable",
+            "details": [f"Could not reach {comfy_http_root}"],
+        }
 
     # 입력 이미지 업로드(예제 스타일: images[] 또는 단일 image_url/base64)
     uploaded_names, upload_errors = _upload_images_from_input(comfy_base_url, job_input)
