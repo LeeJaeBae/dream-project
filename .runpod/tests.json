@@ -14,7 +14,24 @@
   "config": {
     "gpuTypeId": "NVIDIA GeForce RTX 4090",
     "gpuCount": 1,
-    "env": [],
+    "env": [
+      {
+        "key": "COMFY_API_AVAILABLE_MAX_RETRIES",
+        "value": "1"
+      },
+      {
+        "key": "COMFY_API_AVAILABLE_INTERVAL_MS",
+        "value": "1"
+      },
+      {
+        "key": "WEBSOCKET_RECONNECT_ATTEMPTS",
+        "value": "1"
+      },
+      {
+        "key": "WEBSOCKET_RECONNECT_DELAY_S",
+        "value": "1"
+      }
+    ],
     "allowedCudaVersions": [
       "12.7",
       "12.6",

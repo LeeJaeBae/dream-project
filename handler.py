@@ -413,7 +413,9 @@ def handler(event: Dict[str, Any]) -> Dict[str, Any]:
     return {"image_urls": image_urls, "video_urls": video_urls}
 
 
-if __name__ == "__main__":
-    runpod.serverless.start({"handler": handler})
+# RunPod Serverless entrypoint
+# - 문서 예제 패턴: 스크립트 로딩 시 바로 start() 호출
+#   https://docs.runpod.io/serverless/overview#handler-functions
+runpod.serverless.start({"handler": handler})
 
 
