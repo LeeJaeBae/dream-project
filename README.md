@@ -5,6 +5,7 @@
 - RunPod Serverless는 워커 컨테이너 내부에서 `handler(event)`를 호출합니다.
 - 입력은 `event["input"]`로 전달됩니다.
 - 이 템플릿은 ComfyUI API를 호출해서 결과를 만들고, **결과 URL만** 반환합니다.
+  - 참고: https://docs.runpod.io/serverless/overview#handler-functions
 
 ## Structure
 - `handler.py`: RunPod 핸들러 엔트리포인트

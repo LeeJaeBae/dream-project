@@ -127,9 +127,11 @@ def handler(event: Dict[str, Any]) -> Dict[str, Any]:
       }
     """
     # RunPod 문서 패턴: handler(event) / event["input"]
-    # - 일부 예제/런타임에서 input이 없을 수 있으니 안전하게 처리
+    # 참고: https://docs.runpod.io/serverless/overview#handler-functions
     try:
-        job_input = _require_dict(event.get("input", {}), "input")
+        job_input = _require_dict(event["input"], "input")
+    except KeyError:
+        return {"ok": False, "error": "Missing `input` in event"}
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
