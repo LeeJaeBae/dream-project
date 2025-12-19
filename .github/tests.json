@@ -1,0 +1,15 @@
+[
+  {
+    "input": {
+      "workflow": {},
+      "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5GZq0AAAAASUVORK5CYII=",
+      "image_filename": "input.png",
+      "timeout_s": 1
+    },
+    "expected_output": {
+      "error": "ComfyUI server not reachable"
+    }
+  }
+]
+
+
