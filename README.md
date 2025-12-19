@@ -1,3 +1,5 @@
+[![Runpod](https://api.runpod.io/badge/LeeJaeBae/dream-project)](https://console.runpod.io/hub/LeeJaeBae/dream-project)
+
 ## Overview
 이 레포는 **RunPod Serverless Endpoint**에 올릴 **최소 핸들러 컨테이너 템플릿**입니다.
 
