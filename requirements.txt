@@ -1,4 +1,5 @@
 runpod
 requests
+websocket-client
 
 

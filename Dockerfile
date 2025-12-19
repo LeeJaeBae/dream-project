@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip \
   && python -m pip install --no-cache-dir -r /app/requirements.txt \
-  && python -c "import runpod, requests; print('deps_ok')"
+  && python -c "import runpod, requests, websocket; print('deps_ok')"
 
 COPY handler.py /app/handler.py
 
