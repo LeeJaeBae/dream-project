@@ -16,13 +16,9 @@ import runpod
 import requests
 
 
-class InputError(Exception):
-    pass
-
-
 def _require_dict(value: Any, name: str) -> Dict[str, Any]:
     if not isinstance(value, dict):
-        raise InputError(f"`{name}` must be an object")
+        raise ValueError(f"`{name}` must be an object")
     return value
 
 
@@ -119,7 +115,7 @@ def _comfy_file_url(base_url: str, file_info: Dict[str, Any]) -> Optional[str]:
     return f"{base_url}/view?{qs}"
 
 
-def handler(job: Dict[str, Any]) -> Dict[str, Any]:
+def handler(event: Dict[str, Any]) -> Dict[str, Any]:
     """
     입력 형식(이 핸들러가 기대):
       {
@@ -130,10 +126,17 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
         "timeout_s": 300                 // 선택: 완료 대기 최대 시간
       }
     """
-    job_input = _require_dict(job.get("input", {}), "input")
+    # RunPod 문서 패턴: handler(event) / event["input"]
+    # - 일부 예제/런타임에서 input이 없을 수 있으니 안전하게 처리
+    try:
+        job_input = _require_dict(event.get("input", {}), "input")
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
 
-    workflow = job_input.get("workflow")
-    workflow = _require_dict(workflow, "workflow")
+    try:
+        workflow = _require_dict(job_input.get("workflow"), "workflow")
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
 
     image_url = job_input.get("image_url")
     image_base64 = job_input.get("image_base64")
@@ -141,7 +144,7 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
     timeout_s = int(job_input.get("timeout_s") or 300)
 
     if not image_url and not image_base64:
-        raise InputError("Provide either `image_url` or `image_base64`")
+        return {"ok": False, "error": "Provide either `image_url` or `image_base64`"}
 
     comfy_base_url = os.environ.get("COMFYUI_BASE_URL")
     if not comfy_base_url:
@@ -152,13 +155,19 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
         }
 
     # 1) 이미지 bytes 확보
-    if image_url:
-        image_bytes = _download_image_bytes(str(image_url))
-    else:
-        image_bytes = _decode_base64_image(str(image_base64))
+    try:
+        if image_url:
+            image_bytes = _download_image_bytes(str(image_url))
+        else:
+            image_bytes = _decode_base64_image(str(image_base64))
+    except Exception as e:
+        return {"ok": False, "error": f"Failed to load image: {e}"}
 
     # 2) ComfyUI 업로드
-    uploaded_name = _comfy_upload_image(comfy_base_url, image_bytes, image_filename)
+    try:
+        uploaded_name = _comfy_upload_image(comfy_base_url, image_bytes, image_filename)
+    except Exception as e:
+        return {"ok": False, "error": f"Failed to upload image to ComfyUI: {e}"}
     uploaded_image_url = _comfy_file_url(
         comfy_base_url,
         {
@@ -182,7 +191,10 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
                 inputs[str(job_input_image_field)] = uploaded_name
 
     # 4) 큐잉
-    prompt_id = _comfy_queue_prompt(comfy_base_url, workflow)
+    try:
+        prompt_id = _comfy_queue_prompt(comfy_base_url, workflow)
+    except Exception as e:
+        return {"ok": False, "error": f"Failed to queue workflow to ComfyUI: {e}"}
 
     # 5) 완료 대기 + 결과 수집
     deadline = time.time() + max(1, timeout_s)
@@ -190,8 +202,11 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
     last_videos: List[Dict[str, Any]] = []
 
     while time.time() < deadline:
-        history = _comfy_get_history(comfy_base_url, prompt_id)
-        images, videos = _collect_outputs_from_history(history, prompt_id)
+        try:
+            history = _comfy_get_history(comfy_base_url, prompt_id)
+            images, videos = _collect_outputs_from_history(history, prompt_id)
+        except Exception:
+            images, videos = [], []
         last_images, last_videos = images, videos
         if images or videos:
             break

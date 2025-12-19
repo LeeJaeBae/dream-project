@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "missing_comfyui_base_url_returns_error",
+      "input": {
+        "workflow": {},
+        "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5GZq0AAAAASUVORK5CYII=",
+        "image_filename": "input.png",
+        "timeout_s": 1
+      },
+      "timeout": 10000
+    }
+  ],
+  "config": {
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "gpuCount": 1,
+    "env": [],
+    "allowedCudaVersions": [
+      "12.7",
+      "12.6",
+      "12.5",
+      "12.4",
+      "12.3",
+      "12.2",
+      "12.1",
+      "12.0"
+    ]
+  }
+}
+
+

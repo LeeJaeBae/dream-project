@@ -1,0 +1,32 @@
+{
+  "title": "Dream Project",
+  "description": "An example description",
+  "type": "serverless",
+  "category": "video",
+  "iconUrl": "https://example.com/icon.png",
+  "config": {
+    "runsOn": "GPU",
+    "containerDiskInGb": 20,
+    "presets": [
+      {
+        "name": "Default",
+        "defaults": {
+          "COMFYUI_BASE_URL": "http://127.0.0.1:8188"
+        }
+      }
+    ],
+    "env": [
+      {
+        "key": "COMFYUI_BASE_URL",
+        "input": {
+          "name": "ComfyUI Base URL",
+          "type": "string",
+          "description": "ComfyUI API base URL (e.g. http://127.0.0.1:8188)",
+          "default": "http://127.0.0.1:8188"
+        }
+      }
+    ]
+  }
+}
+
+

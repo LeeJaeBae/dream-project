@@ -1,20 +1,22 @@
 ## Overview
-이 폴더는 **RunPod Serverless Endpoint**에 올릴 **최소 핸들러 컨테이너 템플릿**입니다.
+이 레포는 **RunPod Serverless Endpoint**에 올릴 **최소 핸들러 컨테이너 템플릿**입니다.
 
 ## Rules
-- RunPod Serverless는 워커 컨테이너 내부에서 `handler(job)`를 호출합니다.
-- 이 템플릿은 입력을 그대로 `echo`로 반환합니다.
+- RunPod Serverless는 워커 컨테이너 내부에서 `handler(event)`를 호출합니다.
+- 입력은 `event["input"]`로 전달됩니다.
+- 이 템플릿은 ComfyUI API를 호출해서 결과를 만들고, **결과 URL만** 반환합니다.
 
 ## Structure
-- `runpod_serverless/handler.py`: RunPod 핸들러 엔트리포인트
-- `runpod_serverless/requirements.txt`: 파이썬 의존성
-- `runpod_serverless/Dockerfile`: RunPod 빌드용
+- `handler.py`: RunPod 핸들러 엔트리포인트
+- `requirements.txt`: 파이썬 의존성
+- `Dockerfile`: 컨테이너 빌드용
+- `.runpod/hub.json`: RunPod Hub 배포 구성
 
 ## Examples
 ### 1) RunPod 콘솔에서 엔드포인트 생성(개요)
 - **Serverless → New Endpoint**
 - **Docker 이미지 소스**:
-  - GitHub Repo 빌드 사용 시: Dockerfile path를 `runpod_serverless/Dockerfile`로 지정
+  - GitHub Repo 빌드 사용 시: Dockerfile path를 `Dockerfile`로 지정
 
 ### 2) 호출 입력 예시(ComfyUI 브릿지)
 이 핸들러는 (가정상) 컨테이너 내부에 **ComfyUI가 떠있고**, `COMFYUI_BASE_URL`로 접근 가능할 때:
